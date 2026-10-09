@@ -1,7 +1,7 @@
 [submodule "ImprovedCamera/vendor/CommonLibSSE-NG"]
 	path = ImprovedCamera/vendor/CommonLibSSE-NG
 	url = https://github.com/alandtse/CommonLibSSE-NG
-	branch = v10.0
+	branch = v10.0.0
 [submodule "ImprovedCamera/vendor/mINI"]
 	path = ImprovedCamera/vendor/mINI
 	url = https://github.com/ArranzCNL/mINI
