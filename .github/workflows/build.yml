@@ -5,25 +5,79 @@ on:
   push:
     branches: [ main ]
 
+env:
+  VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+  VCPKG_DEFAULT_TRIPLET: x64-windows-static-md
+  COMMONLIB_DIR: ${{ github.workspace }}\ImprovedCamera\vendor\CommonLibSSE-NG
+
 jobs:
   build:
     runs-on: windows-2022
+
     steps:
-      - name: Checkout
+      - name: Checkout ImprovedCameraSE
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
 
-      - name: Build ImprovedCameraSE (Release|x64)
-        run: msbuild build\VC17\ImprovedCameraSE_VS2022.sln /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0 /m
+      - name: Checkout vcpkg
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: master
+          path: vcpkg
+
+      - name: Bootstrap vcpkg
         shell: cmd
+        run: |
+          call "%VCPKG_ROOT%\bootstrap-vcpkg.bat" -disableMetrics
+          "%VCPKG_ROOT%\vcpkg.exe" version
+
+      - name: Install CommonLibSSE-NG dependencies
+        shell: cmd
+        working-directory: ${{ env.COMMONLIB_DIR }}
+        run: |
+          "%VCPKG_ROOT%\vcpkg.exe" install ^
+            --triplet %VCPKG_DEFAULT_TRIPLET% ^
+            --x-manifest-root=. ^
+            --x-install-root="%VCPKG_ROOT%\installed"
+
+      - name: Build CommonLibSSE-NG
+        shell: cmd
+        working-directory: ${{ env.COMMONLIB_DIR }}
+        run: |
+          if exist build\VC17\CommonLibSSE.sln (
+            msbuild build\VC17\CommonLibSSE.sln ^
+              /p:Configuration=Release ^
+              /p:Platform=x64 ^
+              /p:WindowsTargetPlatformVersion=10.0 ^
+              /p:VcpkgRoot=%VCPKG_ROOT% ^
+              /p:VcpkgTriplet=%VCPKG_DEFAULT_TRIPLET% ^
+              /m
+          ) else (
+            echo CommonLib VC17 solution not found; listing available solutions
+            dir /s /b *.sln
+            exit /b 1
+          )
+
+      - name: Build ImprovedCameraSE (Release|x64)
+        shell: cmd
+        run: |
+          msbuild build\VC17\ImprovedCameraSE_VS2022.sln ^
+            /p:Configuration=Release ^
+            /p:Platform=x64 ^
+            /p:WindowsTargetPlatformVersion=10.0 ^
+            /p:VcpkgRoot=%VCPKG_ROOT% ^
+            /p:VcpkgTriplet=%VCPKG_DEFAULT_TRIPLET% ^
+            /m
 
       - name: List output
-        run: dir /s /b build\VC17\.bin
         shell: cmd
+        run: dir /s /b build\VC17\.bin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
