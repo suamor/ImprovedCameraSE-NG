@@ -66,12 +66,6 @@ jobs:
             --config Release ^
             --parallel
 
-      - name: Show CommonLib build outputs
-        shell: cmd
-        run: |
-          dir /s /b "%COMMONLIB_BUILD_DIR%\*.lib"
-          dir /s /b "%COMMONLIB_BUILD_DIR%\*.dll"
-
       - name: Build ImprovedCameraSE (Release|x64)
         shell: cmd
         run: |

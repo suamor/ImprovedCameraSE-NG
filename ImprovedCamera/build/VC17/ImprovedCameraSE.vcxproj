@@ -135,7 +135,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CommonLibSSE.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>del /q "$(TargetDir)*.lib"; "$(TargetDir)*.exp"
@@ -245,9 +247,6 @@ xcopy /s /y "$(SolutionDir)..\..\assets\$(TargetName)\" "$(TargetDir)$(TargetNam
     <None Include="..\..\.clang-format" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\vendor\CommonLibSSE-NG\build\VC17\CommonLibSSE.vcxproj">
-      <Project>{2a2587b1-09b5-3b54-8e12-47c07c344f2f}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\vendor\imgui\build\VC17\libImGui.vcxproj">
       <Project>{d492d2f6-d275-4083-ad10-903a1cbac986}</Project>
     </ProjectReference>
