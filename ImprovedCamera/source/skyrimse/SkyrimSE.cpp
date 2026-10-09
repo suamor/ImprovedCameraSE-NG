@@ -127,6 +127,9 @@ namespace Patch {
 		else if (m_VersionMajor == 1 && m_VersionMinor == 6 && m_VersionRevision >= 1130)
 			m_Build = BuildInfo::k161130;
 
+		else if (m_VersionMajor == 1 && m_VersionMinor == 7 && m_VersionRevision >= 17104)
+			m_Build = BuildInfo::k17104;
+
 		else
 			m_Build = BuildInfo::kInvalid;
 	}

@@ -603,6 +603,11 @@ namespace Patch {
 		Address::Hook::UpdateSwitchPOV = REL::RelocationID(39401, 40476).address() + REL::VariantOffset(0x2AF, 0x294, 0).offset();
 		Address::Hook::UpdateCamera = REL::RelocationID(49852, 50784).address() + 0x1A6;
 		Address::Hook::UpdateFirstPerson = REL::RelocationID(39446, 40522).address() + 0xD7;
+		auto pluginSkyrimSEForOffset = DLLMain::Plugin::Get()->SkyrimSE();
+		const std::size_t tesObjectCellOffset = (pluginSkyrimSEForOffset->Build() == SkyrimSE::BuildInfo::k17104) ? 0x7A : REL::VariantOffset(0x7C, 0x7B, 0).offset();
+		Address::Hook::TESObjectCell_Get3D = REL::RelocationID(18683, 19165).address() + tesObjectCellOffset;
+		const std::size_t smoothAnimOffset = (pluginSkyrimSEForOffset->Build() == SkyrimSE::BuildInfo::k17104) ? 0x2F3 : REL::VariantOffset(0x2EA, 0x2F4, 0).offset();
+		Address::Hook::SmoothAnimationTransitions = REL::RelocationID(40937, 41996).address() + smoothAnimOffset;
 		Address::Hook::TESObjectCell_Get3D = REL::RelocationID(18683, 19165).address() + REL::VariantOffset(0x7C, 0x7B, 0).offset();
 		Address::Hook::SmoothAnimationTransitions = REL::RelocationID(40937, 41996).address() + REL::VariantOffset(0x2EA, 0x2F4, 0).offset();
 		Address::Hook::ShaderReferenceEffect1 = REL::RelocationID(34111, 34913).address() + REL::VariantOffset(0xE1, 0xE1, 0).offset();

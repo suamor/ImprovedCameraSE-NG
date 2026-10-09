@@ -1,0 +1,34 @@
+name: Build ImprovedCameraSE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build ImprovedCameraSE (Release|x64)
+        run: msbuild build\VC17\ImprovedCameraSE_VS2022.sln /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0 /m
+        shell: cmd
+
+      - name: List output
+        run: dir /s /b build\VC17\.bin
+        shell: cmd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImprovedCameraSE-build
+          path: |
+            build/VC17/.bin/x64-Release/ImprovedCameraSE/**
+          if-no-files-found: warn
