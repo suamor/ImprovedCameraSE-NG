@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
@@ -14,8 +14,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libImGui", "..\..\ImprovedCamera\vendor\imgui\build\VC17\libImGui.vcxproj", "{D492D2F6-D275-4083-AD10-903A1CBAC986}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libMinHook", "..\..\ImprovedCamera\vendor\minhook\build\VC17\libMinHook.vcxproj", "{F142A341-5EE0-442D-A15F-98AE9B48DBAE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLibSSE", "..\..\ImprovedCamera\vendor\CommonLibSSE-NG\build\VC17\CommonLibSSE.vcxproj", "{2A2587B1-09B5-3B54-8E12-47C07C344F2F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spdlog", "..\..\ImprovedCamera\vendor\CommonLibSSE-NG\vendor\spdlog\build\VC17\spdlog.vcxproj", "{14F85606-5199-4084-8975-A1180C244F99}"
 EndProject

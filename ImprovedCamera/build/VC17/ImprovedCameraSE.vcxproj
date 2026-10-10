@@ -135,8 +135,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+        $(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Release;
+        $(ProjectDir)..\..\vendor\CommonLibSSE-NG\build-ci\Debug
+        $(VcpkgRoot)\installed\$(VcpkgTriplet)\lib;
+        $(VcpkgRoot)\installed\$(VcpkgTriplet)\lib\manual-link;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
       <AdditionalDependencies>CommonLibSSE.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
