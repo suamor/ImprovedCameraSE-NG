@@ -121,7 +121,7 @@
       </ForcedIncludeFiles>
       <UseFullPaths>false</UseFullPaths>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\pch;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\include;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\vendor\spdlog\include;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\vendor\rapidcsv\src;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\vendor\xbyak;$(ProjectDir)..\..\vendor\minhook\include;$(ProjectDir)..\..\vendor\mINI\src;$(ProjectDir)..\..\vendor\imgui;$(ProjectDir)..\..\vendor\glm;$(ProjectDir)..\..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\include;$(ProjectDir)..\..\pch;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\include;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\vendor\rapidcsv\src;$(ProjectDir)..\..\vendor\CommonLibSSE-NG\vendor\xbyak;$(ProjectDir)..\..\vendor\minhook\include;$(ProjectDir)..\..\vendor\mINI\src;$(ProjectDir)..\..\vendor\imgui;$(ProjectDir)..\..\vendor\glm;$(ProjectDir)..\..\vendor;$(VcpkgRoot)\installed\$(VcpkgTriplet)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
