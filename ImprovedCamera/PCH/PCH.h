@@ -10,6 +10,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
+#include <Windows.h>
+
 // CommonLibSSE-NG headers
 // 4005 - macro redefinition
 // 4200 - zero-sized array

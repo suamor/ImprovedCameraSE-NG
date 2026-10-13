@@ -68,7 +68,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;NOMINMAX;ENABLE_SKYRIM_SE=1;ENABLE_SKYRIM_AE=1;SKSE_SUPPORT_XBYAK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;ENABLE_SKYRIM_SE=1;ENABLE_SKYRIM_AE=1;SKSE_SUPPORT_XBYAK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -109,7 +109,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;NOMINMAX;ENABLE_SKYRIM_SE=1;ENABLE_SKYRIM_AE=1;SKSE_SUPPORT_XBYAK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;ENABLE_SKYRIM_SE=1;ENABLE_SKYRIM_AE=1;SKSE_SUPPORT_XBYAK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
