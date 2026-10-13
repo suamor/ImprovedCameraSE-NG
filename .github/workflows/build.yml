@@ -66,6 +66,28 @@ jobs:
             --config Release ^
             --parallel
 
+      - name: Preprocess PCH for macro diagnosis
+        shell: cmd
+        run: |
+          cl /nologo /P /Zc:preprocessor /std:c++20 /permissive- ^
+            /DNDEBUG /DNOMINMAX ^
+            /DENABLE_SKYRIM_SE=1 /DENABLE_SKYRIM_AE=1 /DSKSE_SUPPORT_XBYAK=1 ^
+            /IImprovedCamera\include ^
+            /IImprovedCamera\pch ^
+            /IImprovedCamera\vendor\CommonLibSSE-NG\include ^
+            /IImprovedCamera\vendor\CommonLibSSE-NG\vendor\rapidcsv\src ^
+            /IImprovedCamera\vendor\CommonLibSSE-NG\vendor\xbyak ^
+            /IImprovedCamera\vendor\minhook\include ^
+            /IImprovedCamera\vendor\mINI\src ^
+            /IImprovedCamera\vendor\imgui ^
+            /IImprovedCamera\vendor\glm ^
+            /IImprovedCamera\vendor ^
+            /Ivcpkg\installed\x64-windows-static-md\include ^
+            ImprovedCamera\PCH\PCH.cpp
+
+          powershell -NoProfile -Command ^
+            "$c = Get-Content PCH.i; $c[470..530] | ForEach-Object { $_ }"
+
       - name: Build ImprovedCameraSE (Release|x64)
         shell: cmd
         run: |

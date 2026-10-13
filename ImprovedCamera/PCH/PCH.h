@@ -27,7 +27,7 @@
 #include <glm/glm.hpp>
 
 // Windows API headers must follow CommonLib/SKSE.
-#include <Windows.h>
+//#include <Windows.h>
 #include <Psapi.h>
 
 using namespace std::literals;

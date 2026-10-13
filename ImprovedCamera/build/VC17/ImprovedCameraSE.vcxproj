@@ -85,7 +85,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <UseStandardPreprocessor>true</UseStandardPreprocessor>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
       <BuildStlModules>false</BuildStlModules>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
