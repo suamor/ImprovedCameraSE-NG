@@ -10,23 +10,24 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-#include <Windows.h>
-
-// CommonLibSSE-NG headers
+// CommonLibSSE-NG must be included before Windows API headers.
 // 4005 - macro redefinition
 // 4200 - zero-sized array
 #pragma warning(push)
 #pragma warning(disable: 4005 4200 4324)
 #include <RE/Skyrim.h>
-#pragma warning(pop)
 #include <SKSE/SKSE.h>
+#pragma warning(pop)
+
+// Other dependencies that may require CommonLib to be initialized first.
 #include <xbyak/xbyak.h>
-
-// Additional headers
-#include <Psapi.h>
-
 // OpenGL Mathematics 
 #include <glm/glm.hpp>
+
+// Additional headers (no CommonLib Headers may be in one of the following includes)
+#include <Windows.h>
+#include <Psapi.h>
+
 
 using namespace std::literals;
 
