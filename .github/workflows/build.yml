@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
 
 env:
   VCPKG_ROOT: ${{ github.workspace }}\vcpkg
@@ -12,7 +17,7 @@ env:
   COMMONLIB_BUILD_DIR: ${{ github.workspace }}\ImprovedCamera\vendor\CommonLibSSE-NG\build-ci
 
 jobs:
-  build:
+  build-msvc:
     runs-on: windows-2022
 
     steps:
@@ -22,8 +27,13 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set up Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v6
 
       - name: Checkout vcpkg
         uses: actions/checkout@v4
@@ -38,81 +48,18 @@ jobs:
           call "%VCPKG_ROOT%\bootstrap-vcpkg.bat" -disableMetrics
           "%VCPKG_ROOT%\vcpkg.exe" version
 
-      - name: Install CommonLibSSE-NG vcpkg dependencies
-        shell: cmd
-        working-directory: ${{ env.COMMONLIB_DIR }}
-        run: |
-          "%VCPKG_ROOT%\vcpkg.exe" install ^
-            --triplet %VCPKG_DEFAULT_TRIPLET% ^
-            --x-manifest-root=. ^
-            --x-install-root="%VCPKG_ROOT%\installed"
+      - name: Configure
+        run: cmake --preset release
 
-      - name: Configure CommonLibSSE-NG with CMake
-        shell: cmd
-        working-directory: ${{ env.COMMONLIB_DIR }}
-        run: |
-          cmake -S . -B "%COMMONLIB_BUILD_DIR%" ^
-            -G "Visual Studio 17 2022" ^
-            -A x64 ^
-            -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
-            -DVCPKG_TARGET_TRIPLET=%VCPKG_DEFAULT_TRIPLET% ^
-            -DVCPKG_MANIFEST_MODE=OFF ^
-            -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/release --config Release --parallel 4
 
-      - name: Build CommonLibSSE-NG with CMake
-        shell: cmd
-        run: |
-          cmake --build "%COMMONLIB_BUILD_DIR%" ^
-            --config Release ^
-            --parallel
-
-      - name: Preprocess PCH for macro diagnosis
-        shell: cmd
-        run: |
-          for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
-            set "VSPATH=%%i"
-          )
-
-          call "%VSPATH%\VC\Auxiliary\Build\vcvars64.bat"        
-        
-          cl /nologo /P /Zc:preprocessor /std:c++20 /permissive- ^
-            /DNDEBUG /DNOMINMAX ^
-            /DENABLE_SKYRIM_SE=1 /DENABLE_SKYRIM_AE=1 /DSKSE_SUPPORT_XBYAK=1 ^
-            /IImprovedCamera\include ^
-            /IImprovedCamera\pch ^
-            /IImprovedCamera\vendor\CommonLibSSE-NG\include ^
-            /IImprovedCamera\vendor\CommonLibSSE-NG\vendor\rapidcsv\src ^
-            /IImprovedCamera\vendor\CommonLibSSE-NG\vendor\xbyak ^
-            /IImprovedCamera\vendor\minhook\include ^
-            /IImprovedCamera\vendor\mINI\src ^
-            /IImprovedCamera\vendor\imgui ^
-            /IImprovedCamera\vendor\glm ^
-            /IImprovedCamera\vendor ^
-            /Ivcpkg\installed\x64-windows-static-md\include ^
-            ImprovedCamera\PCH\PCH.cpp
-
-          powershell -NoProfile -Command ^
-            "$c = Get-Content PCH.i; $c[470..530] | ForEach-Object { $_ }"
-
-      - name: Build ImprovedCameraSE (Release|x64)
-        shell: cmd
-        run: |
-          msbuild build\VC17\ImprovedCameraSE_VS2022.sln ^
-            /p:Configuration=Release ^
-            /p:Platform=x64 ^
-            /p:WindowsTargetPlatformVersion=10.0 ^
-            /p:VcpkgRoot=%VCPKG_ROOT% ^
-            /p:VcpkgTriplet=%VCPKG_DEFAULT_TRIPLET% ^
-            /m
-
-      - name: List output
-        shell: cmd
-        run: dir /s /b build\VC17\.bin
-
-      - name: Upload artifact
+      - name: Upload plugin artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ImprovedCameraSE-build
+          name: ImprovedCameraSE-MSVC-Release
           path: |
-            build/VC17/.bin/x64-Release/ImprovedCameraSE/**
-          if-no-files-found: warn
+            build/release/**/*.dll
+            build/release/**/*.pdb
+            output/**/*.dll
+          if-no-files-found: error
