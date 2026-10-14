@@ -1,0 +1,42 @@
+#!/bin/bash
+
+args=()
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -T)
+            shift
+            profile="$1"
+
+            case "$profile" in
+                vs_4_0_level_9_1)
+                    profile="vs_4_0"
+                    ;;
+                ps_4_0_level_9_1)
+                    profile="ps_4_0"
+                    ;;
+            esac
+
+            args+=("-T" "$profile")
+            ;;
+
+        -Fd)
+            # FXC accepts /Fd for the shader PDB.
+            # DXC requires debug information for this.
+            shift
+            ;;
+
+        *)
+            args+=("$1")
+            ;;
+    esac
+
+    shift
+done
+
+exec dxc \
+    -HV 2016 \
+    -flegacy-macro-expansion \
+    -flegacy-resource-reservation \
+    -Wno-ambig-lit-shift \
+    "${args[@]}"

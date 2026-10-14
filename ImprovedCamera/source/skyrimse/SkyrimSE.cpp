@@ -32,6 +32,8 @@ namespace Patch {
 			m_WindowName += " GOG";
 	}
 
+    SkyrimSE::~SkyrimSE() = default;
+
 	void SkyrimSE::OnLoad()
 	{
 		if (m_OnLoaded)

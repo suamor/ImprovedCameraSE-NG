@@ -1,0 +1,15 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "directxtk",
+    "version-date": "2026-05-07",
+    "port-version": 2,
+    "description": "A collection of helper classes for writing DirectX 11.x code in C++. Overlay port for Linux cross-compiles.",
+    "homepage": "https://github.com/Microsoft/DirectXTK",
+    "documentation": "https://github.com/microsoft/DirectXTK/wiki",
+    "license": "MIT",
+    "dependencies": [
+        "directxmath",
+        "vcpkg-cmake",
+        "vcpkg-cmake-config"
+    ]
+}

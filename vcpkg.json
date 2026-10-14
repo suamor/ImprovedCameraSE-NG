@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "outfit-slots",
+    "version-string": "1.2.0",
+    "dependencies": [
+        "directxtk",
+        "fmt",
+        "rapidcsv",
+        "safetyhook",
+        "spdlog",
+        "xbyak",
+        "simpleini",
+        "jsoncpp",
+        "tinyxml2",
+        "directxtex",
+        { "name": "imgui", "features": ["dx11-binding", "win32-binding"] }
+    ],
+    "overrides": [
+        { "name": "safetyhook", "version": "0.7.0" },
+        { "name": "zydis", "version": "4.1.1" },
+        { "name": "zycore", "version": "1.5.2" },
+        { "name": "imgui", "version": "1.92.8" }
+    ]
+}

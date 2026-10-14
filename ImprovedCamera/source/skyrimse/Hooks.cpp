@@ -176,7 +176,13 @@ namespace Patch {
 				auto& trampoline = SKSE::GetTrampoline();
 				SKSE::AllocTrampoline(32);
 
-				_Effect = trampoline.write_call<5>(Address::Hook::ShaderReferenceEffect1, trampoline.allocate(patch));
+                //  allocate space for the generated machine code, copy the code into that space, and pass its address to write_call.
+                // This uses the overloads available in your build without depending on the optional Xbyak-specific allocate overload.
+                const auto patchSize = patch.getSize();
+                auto* patchMemory = trampoline.allocate(patchSize);
+                std::memcpy(patchMemory, patch.getCode(), patchSize);
+
+                _Effect = trampoline.write_call<5>(Address::Hook::ShaderReferenceEffect1, reinterpret_cast<std::uintptr_t>(patchMemory));
 			}
 
 		private:
@@ -211,7 +217,11 @@ namespace Patch {
 				auto& trampoline = SKSE::GetTrampoline();
 				SKSE::AllocTrampoline(32);
 
-				_Effect = trampoline.write_call<6>(Address::Hook::ShaderReferenceEffect2, trampoline.allocate(patch));
+                const auto patchSize = patch.getSize();
+                auto* patchMemory = trampoline.allocate(patchSize);
+                std::memcpy(patchMemory, patch.getCode(), patchSize);
+
+                _Effect = trampoline.write_call<6>(Address::Hook::ShaderReferenceEffect2, reinterpret_cast<std::uintptr_t>(patchMemory));
 			}
 
 		private:
@@ -303,7 +313,13 @@ namespace Patch {
 			auto& trampoline = SKSE::GetTrampoline();
 			SKSE::AllocTrampoline(32);
 
-			_IsTaskPoolRequired = trampoline.write_call<5>(Address::Hook::Ragdoll_IsTaskPoolRequired, trampoline.allocate(patch));
+            const auto patchSize = patch.getSize();
+            auto* patchMemory = trampoline.allocate(patchSize);
+            std::memcpy(patchMemory, patch.getCode(), patchSize);
+
+            _IsTaskPoolRequired = trampoline.write_call<5>(
+                Address::Hook::Ragdoll_IsTaskPoolRequired,
+                reinterpret_cast<std::uintptr_t>(patchMemory));
 		}
 
 	private:

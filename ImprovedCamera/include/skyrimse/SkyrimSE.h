@@ -39,7 +39,8 @@ namespace Patch {
 
 	public:
 		SkyrimSE();
-		virtual ~SkyrimSE() = default;
+        // Do define destructor here, else all unknown types need to be moved to header
+		virtual ~SkyrimSE();
 
 	public:
 		const std::string& FullName() const { return m_FullName; };
@@ -70,8 +71,10 @@ namespace Patch {
 		std::uintptr_t m_BaseAddress = NULL;
 		std::uintptr_t m_ImageSize = NULL;
 
-		std::unique_ptr<Patch::Hooks> m_Hooks = nullptr;
-		std::unique_ptr<ImprovedCamera::ImprovedCameraSE> m_Camera = nullptr;
+        // Do not initialize a unique_ptr to null, see std C++ library reference
+        // If you do this the complete declaration of all types needs to be known
+		std::unique_ptr<Patch::Hooks> m_Hooks;
+		std::unique_ptr<ImprovedCamera::ImprovedCameraSE> m_Camera;
 
 	private:
 		void OnLoad();
@@ -88,5 +91,4 @@ namespace Patch {
 		friend void SKSE::SKSEMessageHandler(SKSE::MessagingInterface::Message* message);
 		friend bool SKSE::SKSEPlugin_Load(const SKSE::LoadInterface* skse);
 	};
-
 }

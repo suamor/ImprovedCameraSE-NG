@@ -41,7 +41,7 @@ namespace ImprovedCamera {
 		{
 			if (const auto charEvent = event->AsCharEvent())
 			{
-				pluginGraphics->m_UI.get()->AddCharacterEvent(charEvent->keycode);
+				pluginGraphics->m_UI.get()->AddCharacterEvent(charEvent->keyCode);
 			}
 			else if (const auto buttonEvent = event->AsButtonEvent())
 			{
@@ -1038,22 +1038,34 @@ namespace ImprovedCamera {
 		}
 	}
 
-	void ImprovedCameraSE::DisplayShadows(bool show)
-	{
-		auto thirdperson3D = RE::PlayerCharacter::GetSingleton()->Get3D(0);
-		if (!thirdperson3D)
-			return;
+    // traverse the third-person model's geometry and update the cast-shadows flag only for lighting shader properties.
+    // The runtime-data accessor and shaderProperty member match the current CommonLib-NG API.
+    void ImprovedCameraSE::DisplayShadows(bool show)
+    {
+        auto thirdperson3D = RE::PlayerCharacter::GetSingleton()->Get3D(0);
+        if (!thirdperson3D)
+            return;
 
-		RE::BSVisit::TraverseScenegraphGeometries(thirdperson3D, [&](RE::BSGeometry* a_geometry) -> RE::BSVisit::BSVisitControl {
-			const auto& effect = a_geometry->properties[RE::BSGeometry::States::kEffect];
-			const auto lightingShader = netimmerse_cast<RE::BSLightingShaderProperty*>(effect.get());
+        RE::BSVisit::TraverseScenegraphGeometries(
+            thirdperson3D,
+            [&](RE::BSGeometry* a_geometry) -> RE::BSVisit::BSVisitControl
+            {
+                const auto& shaderProperty =
+                    a_geometry->GetGeometryRuntimeData().shaderProperty;
 
-			if (lightingShader)
-				lightingShader->SetFlags(RE::BSShaderProperty::EShaderPropertyFlag8::kCastShadows, show);
+                const auto lightingShader =
+                    netimmerse_cast<RE::BSLightingShaderProperty*>(shaderProperty.get());
 
-			return RE::BSVisit::BSVisitControl::kContinue;
-		});
-	}
+                if (lightingShader)
+                {
+                    lightingShader->SetFlags(
+                        RE::BSShaderProperty::EShaderPropertyFlag8::kCastShadows,
+                        show);
+                }
+
+                return RE::BSVisit::BSVisitControl::kContinue;
+            });
+    }
 
 	float ImprovedCameraSE::UpdateNearDistance(float fNear)
 	{

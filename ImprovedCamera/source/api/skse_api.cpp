@@ -74,18 +74,23 @@ namespace SKSE {
 		}
 	}
 
-	SKSE_API constinit auto SKSEPlugin_Version = []() noexcept {
-		SKSE::PluginVersionData pluginData{};
-		REL::Version version{ VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, VERSION_BUILD };
+    // Modernized Initialization of Plugin
+    SKSE_API constinit auto SKSEPlugin_Version = []() noexcept {
+        SKSE::PluginVersionData pluginData{};
+        REL::Version version{
+            VERSION_MAJOR,
+            VERSION_MINOR,
+            VERSION_REVISION,
+            VERSION_BUILD
+        };
 
-		pluginData.PluginName(VERSION_PRODUCTNAME_STR);
-		pluginData.PluginVersion(version);
-		pluginData.AuthorName(VERSION_AUTHOR_STR);
-		pluginData.UsesAddressLibrary(true);
-		pluginData.HasNoStructUse(true);
+        pluginData.PluginName(VERSION_PRODUCTNAME_STR);
+        pluginData.PluginVersion(version);
+        pluginData.AuthorName(VERSION_AUTHOR_STR);
+        pluginData.UsesAddressLibrary();
 
-		return pluginData;
-	}();
+        return pluginData;
+    }();
 
 	SKSE_API bool SKSEPlugin_Query(const SKSE::QueryInterface* skse, SKSE::PluginInfo* pluginInfo)
 	{

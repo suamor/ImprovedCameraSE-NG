@@ -9,7 +9,9 @@
 
 #include "systems/Graphics.h"
 
-#include "Utils/PatternScan.h"
+// DO NOT MIX case sensitivity in includes!
+// DO NOT ASSUME filesystem is case insensitive!
+#include "utils/PatternScan.h"
 #include "plugin.h"
 #include "utils/Log.h"
 #include "utils/Utils.h"
@@ -67,18 +69,23 @@ namespace Systems {
 				const auto renderer = RE::BSGraphics::Renderer::GetSingleton();
 				auto swapChain = renderer->GetRuntimeData().renderWindows[0].swapChain;
 
-				if (SUCCEEDED(swapChain->GetDevice(IID_PPV_ARGS(&pluginGraphics->m_Device))))
-				{
-					pluginGraphics->m_Device->GetImmediateContext(&pluginGraphics->m_DeviceContext);
-					pluginGraphics->m_UI = UI::CreateMenu(pluginGraphics->m_OutputWindow);
+                // Use explicit CommonLib GUID and output pointer
+                // REX::W32::IID_ID3D11Device is the GUID provided by CommonLib for ID3D11Device.
+                // The explicit cast bridges the ComPtr output pointer to the void** required by GetDevice()
+                if (SUCCEEDED(swapChain->GetDevice(
+                        REX::W32::IID_ID3D11Device,
+                        reinterpret_cast<void**>(pluginGraphics->m_Device.GetAddressOf()))))
+                {
+                    pluginGraphics->m_Device->GetImmediateContext(pluginGraphics->m_DeviceContext.GetAddressOf());
+                    pluginGraphics->m_UI = UI::CreateMenu(pluginGraphics->m_OutputWindow);
 
-					if (pluginGraphics->m_UI->Initialize())
-						pluginGraphics->m_Initialized = true;
-				}
-				else
-				{
-					return;
-				}
+                    if (pluginGraphics->m_UI->Initialize())
+                        pluginGraphics->m_Initialized = true;
+                }
+                else
+                {
+                    return;
+                }
 			}
 			pluginGraphics->m_UI->BeginFrame();
 			pluginGraphics->m_UI->OnUpdate();

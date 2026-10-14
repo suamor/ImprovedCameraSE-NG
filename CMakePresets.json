@@ -1,0 +1,74 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}",
+            "architecture": { "value": "x64", "strategy": "external" },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_MAKE_PROGRAM": "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+                "CMAKE_CXX_FLAGS": "/permissive- /Zc:preprocessor /EHsc /MP /W4 /we4062 -DWIN32_LEAN_AND_MEAN -DNOMINMAX -DUNICODE -D_UNICODE",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static-md",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake",
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "xwin-clang-cl",
+            "displayName": "Linux → Windows (clang-cl + xwin)",
+            "description": "Cross-compile Windows DLL/EXE using clang-cl, lld-link, xwin SDK and vcpkg",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build-xwin",
+            "toolchainFile": "${sourceDir}/ImprovedCamera/vendor/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_MAKE_PROGRAM":
+                       "/usr/bin/ninja",
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static-md-xwin",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake",
+                "VCPKG_OVERLAY_PORTS": "${sourceDir}/cmake/overlay-ports",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/xwin-clang-cl.cmake",
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "OUTPUT_FOLDER": "${sourceDir}/output/xwin-clang-cl"
+            },
+            "environment": {
+                "XWIN_DIR": "$env{HOME}/.xwin"
+            }
+        },        
+        {
+            "name": "release",
+            "inherits": ["base"],
+            "displayName": "Release",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+        {
+            "name": "xwin-clang-cl-release",
+            "inherits": ["xwin-clang-cl"],
+            "displayName": "Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "OUTPUT_FOLDER": "${sourceDir}/output/xwin-clang-cl-release"
+            }
+        },
+        {
+            "name": "debug",
+            "inherits": ["base"],
+            "displayName": "Debug",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "xwin-clang-cl-release",
+            "configurePreset": "xwin-clang-cl-release",
+            "configuration": "Release"
+        }
+    ]
+}

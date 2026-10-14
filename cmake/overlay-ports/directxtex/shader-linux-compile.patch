@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0000000..0000000 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -229,7 +229,7 @@
+             MAIN_DEPENDENCY "${PROJECT_SOURCE_DIR}/DirectXTex/Shaders/CompileShaders.cmd"
+             DEPENDS ${SHADER_SOURCES}
+             COMMENT "Generating HLSL shaders..."
+-            COMMAND ${CMAKE_COMMAND} -E env CompileShadersOutput="${COMPILED_SHADERS}" $<$<BOOL:${DIRECTX_FXC_TOOL}>:LegacyShaderCompiler=${DIRECTX_FXC_TOOL}> CompileShaders.cmd > "${COMPILED_SHADERS}/compileshaders.log"
++            COMMAND "${PROJECT_SOURCE_DIR}/DirectXTex/Shaders/compile-shaders.sh" "${COMPILED_SHADERS}" "${DIRECTX_FXC_TOOL}" ${ShaderOpts}
+             WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/DirectXTex/Shaders"
+             USES_TERMINAL)
+     endif()

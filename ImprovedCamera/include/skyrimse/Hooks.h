@@ -6,18 +6,7 @@
 
 #pragma once
 
-namespace RE {
-
-	class BSLookAtModifier {
-
-	public:
-		inline static constexpr auto RTTI = RTTI_BSLookAtModifier;
-		inline static constexpr auto VTABLE = VTABLE_BSLookAtModifier;
-
-		virtual ~BSLookAtModifier();  // 00
-	};
-	//static_assert(sizeof(BSLookAtModifier) == 0x277);
-}
+// BSLookAtModifier is part of CommonLibSSE-NG, do not import it into project
 
 namespace Menu {
 
