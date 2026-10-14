@@ -150,6 +150,31 @@ namespace Patch {
 		static inline constexpr std::size_t index{ 23 };
 	};
 
+
+    //  allocate space for the generated machine code, copy the code into that space, and pass its address to write_call.
+    // This uses the overloads available in your build without depending on the optional Xbyak-specific allocate overload.
+    template <typename Code>
+    std::uintptr_t AllocatePatch(
+        SKSE::Trampoline& trampoline,
+        const Code& patch)
+    {
+        const auto patchSize = patch.getSize();
+
+        if (patchSize == 0 || patch.getCode() == nullptr) {
+            throw std::runtime_error("Generated hook patch is empty");
+        }
+
+        auto* patchMemory = trampoline.allocate(patchSize);
+
+        if (patchMemory == nullptr) {
+            throw std::runtime_error("Failed to allocate hook patch memory");
+        }
+
+        std::memcpy(patchMemory, patch.getCode(), patchSize);
+
+        return reinterpret_cast<std::uintptr_t>(patchMemory);
+    }
+
 	struct ShaderReferenceEffect_Update {
 
 		struct Patch1 {
@@ -176,14 +201,8 @@ namespace Patch {
 				auto& trampoline = SKSE::GetTrampoline();
 				SKSE::AllocTrampoline(32);
 
-                //  allocate space for the generated machine code, copy the code into that space, and pass its address to write_call.
-                // This uses the overloads available in your build without depending on the optional Xbyak-specific allocate overload.
-                const auto patchSize = patch.getSize();
-                auto* patchMemory = trampoline.allocate(patchSize);
-                std::memcpy(patchMemory, patch.getCode(), patchSize);
-
-                _Effect = trampoline.write_call<5>(Address::Hook::ShaderReferenceEffect1, reinterpret_cast<std::uintptr_t>(patchMemory));
-			}
+                _Effect = trampoline.write_call<5>(Address::Hook::ShaderReferenceEffect1, AllocatePatch(trampoline,patch));
+            }
 
 		private:
 			static bool Effect(void* arg1, RE::Actor* actor)
@@ -217,11 +236,7 @@ namespace Patch {
 				auto& trampoline = SKSE::GetTrampoline();
 				SKSE::AllocTrampoline(32);
 
-                const auto patchSize = patch.getSize();
-                auto* patchMemory = trampoline.allocate(patchSize);
-                std::memcpy(patchMemory, patch.getCode(), patchSize);
-
-                _Effect = trampoline.write_call<6>(Address::Hook::ShaderReferenceEffect2, reinterpret_cast<std::uintptr_t>(patchMemory));
+                _Effect = trampoline.write_call<6>(Address::Hook::ShaderReferenceEffect2, AllocatePatch(trampoline,patch));
 			}
 
 		private:
@@ -313,13 +328,7 @@ namespace Patch {
 			auto& trampoline = SKSE::GetTrampoline();
 			SKSE::AllocTrampoline(32);
 
-            const auto patchSize = patch.getSize();
-            auto* patchMemory = trampoline.allocate(patchSize);
-            std::memcpy(patchMemory, patch.getCode(), patchSize);
-
-            _IsTaskPoolRequired = trampoline.write_call<5>(
-                Address::Hook::Ragdoll_IsTaskPoolRequired,
-                reinterpret_cast<std::uintptr_t>(patchMemory));
+            _IsTaskPoolRequired = trampoline.write_call<5>(Address::Hook::Ragdoll_IsTaskPoolRequired, AllocatePatch(trampoline,patch));
 		}
 
 	private:

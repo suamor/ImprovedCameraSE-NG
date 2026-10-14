@@ -1,0 +1,21 @@
+
+#pragma once
+
+#pragma comment(lib, "Version.lib")
+
+#define MAKE_STR_HELPER(a_str) #a_str
+#define MAKE_STR(a_str) MAKE_STR_HELPER(a_str)
+
+#define VERSION_MAJOR                       @VERSION_MAJOR@
+#define VERSION_MINOR                       @VERSION_MINOR@
+#define VERSION_REVISION                    @VERSION_REVISION@
+#define VERSION_BUILD                       @VERSION_BUILD@
+
+#define VERSION_STR                         MAKE_STR(VERSION_MAJOR) "." MAKE_STR(VERSION_MINOR) "." MAKE_STR(VERSION_REVISION) "." MAKE_STR(VERSION_BUILD)
+
+#define VERSION_PRODUCTNAME_DESCRIPTION_STR "Improved Camera SE" " v" VERSION_STR
+#define VERSION_PRODUCTNAME_STR             "@VERSION_PRODUCTNAME_STR@"
+#define VERSION_YEARS_STR                   "@VERSION_YEARS_STR@"
+#define VERSION_AUTHOR_STR                  "@VERSION_AUTHOR_STR@"
+#define VERSION_LICENSE_STR                 "@VERSION_LICENSE@"
+#define VERSION_COPYRIGHT_STR               "@VERSION_LICENSE_STR@"

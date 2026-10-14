@@ -74,45 +74,6 @@ namespace SKSE {
 		}
 	}
 
-    // Modernized Initialization of Plugin
-    SKSE_API constinit auto SKSEPlugin_Version = []() noexcept {
-        SKSE::PluginVersionData pluginData{};
-        REL::Version version{
-            VERSION_MAJOR,
-            VERSION_MINOR,
-            VERSION_REVISION,
-            VERSION_BUILD
-        };
-
-        pluginData.PluginName(VERSION_PRODUCTNAME_STR);
-        pluginData.PluginVersion(version);
-        pluginData.AuthorName(VERSION_AUTHOR_STR);
-        pluginData.UsesAddressLibrary();
-
-        return pluginData;
-    }();
-
-	SKSE_API bool SKSEPlugin_Query(const SKSE::QueryInterface* skse, SKSE::PluginInfo* pluginInfo)
-	{
-		pluginInfo->name = SKSEPlugin_Version.pluginName;
-		pluginInfo->version = SKSEPlugin_Version.pluginVersion;
-		pluginInfo->infoVersion = SKSE::PluginInfo::kVersion;
-
-		if (skse->IsEditor())
-		{
-			LOG_CRITICAL("Loaded in editor, marking as incompatible");
-			return false;
-		}
-
-		const auto version = skse->RuntimeVersion();
-		if (version < SKSE::RUNTIME_SSE_1_5_97)
-		{
-			LOG_CRITICAL("Unsupported runtime version {}", version.string());
-			return false;
-		}
-		return true;
-	}
-
 	SKSE_API bool SKSEPlugin_Load(const SKSE::LoadInterface* skse)
 	{
 		auto plugin = DLLMain::Plugin::Get();
@@ -121,6 +82,11 @@ namespace SKSE {
 		DumpSpecificVersion();
 #endif
 		SKSE::Init(skse);
+
+        // Reserve executable memory for the generated hook patches (Hooks.cpp).
+        // This must happen before any hook calls trampoline.allocate().
+        SKSE::AllocTrampoline(1 << 14);  // 16 KiB
+
 		bool loaded = plugin->Load();
 
 		if (loaded)

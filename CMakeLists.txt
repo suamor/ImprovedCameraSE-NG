@@ -2,10 +2,24 @@ cmake_minimum_required(VERSION 3.21)
 
 # Get rid of overly annoying errors even though qmake is in PATH
 set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
-# "Fitting Room" (formerly Outfit Slots) - ESO-style transmog with saved outfit slots.
-# One DLL supports Skyrim SE 1.5.97 and next-gen AE 1.6.1130+.
-project(ImprovedCameraSE VERSION 1.1.2 LANGUAGES CXX)
+# "Improved Camera SE" - Enables 1st Person body and allows playback of 3rd Person Animations
+# One DLL supports Skyrim SE 1.5.97, AE 1.6.1130+, AE 1.7.104+.
+project(ImprovedCameraSE VERSION 1.1.3 LANGUAGES CXX RC)
 
+# Version components: the first three come from project(VERSION ...).
+set(VERSION_MAJOR    "${PROJECT_VERSION_MAJOR}")
+set(VERSION_MINOR    "${PROJECT_VERSION_MINOR}")
+set(VERSION_REVISION "${PROJECT_VERSION_PATCH}")
+
+# Explicit build number, preserved from the current version.h.
+# Override with -DVERSION_BUILD=4230 for the next build.
+set(VERSION_BUILD "4229" CACHE STRING "Improved Camera build number")
+
+# Product metadata
+set(VERSION_PRODUCTNAME_STR "ImprovedCameraSE")
+set(VERSION_YEARS_STR      "(C) 2021-2026")
+set(VERSION_AUTHOR_STR     "IC Team")
+set(VERSION_LICENSE_STR    "(GPL v3.0)")
 
 # Some versions of MSVC collide in own Windows headers with oder min/max declarations
 if (WIN32)
@@ -36,7 +50,9 @@ message(STATUS "ImprovedCameraSE builds on CommonLibSSE-NG ${IC_COMMONLIB_VERSIO
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 find_package(jsoncpp CONFIG REQUIRED)
 unset(CMAKE_POLICY_VERSION_MINIMUM)
-find_package(imgui CONFIG REQUIRED)
+# ⚠ We do not use the external package but keep version info (dependency for CommonLibSSE)
+# Later updates will require update of custom port of imgui
+# find_package(imgui CONFIG REQUIRED)
 find_package(tinyxml2 CONFIG REQUIRED)
 # ⚠ NAMED HERE SO A TEST TARGET CAN LINK IT. The plugin picks spdlog up through
 # CommonLibSSE and its precompiled header, but a test executable carries neither,
@@ -63,17 +79,10 @@ find_package(directxtex CONFIG REQUIRED)
 # because the baseline predates the safetyhook port.
 find_package(safetyhook CONFIG REQUIRED)
 
-# ⚠ A CRASH LOG THAT CANNOT NAME OUR BUILD COSTS A DIAGNOSIS. This puts the
-# version into the DLL itself, so Crash Logger and Trainwreck print it beside
-# our name like every other plugin. Generated from project() so it cannot
-# drift from the other version files.
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/version.rc" @ONLY)
-
 add_commonlibsse_plugin(${PROJECT_NAME}
     SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/version.rc"
         ImprovedCamera/PCH/PCH.h
+        ImprovedCamera/PCH/PCH.cpp
     	ImprovedCamera/source/api/skse_api.cpp
     	ImprovedCamera/source/build/vendor.cpp
     	ImprovedCamera/source/cameras/DeathCinematic.cpp
@@ -113,13 +122,47 @@ add_commonlibsse_plugin(${PROJECT_NAME}
     	ImprovedCamera/source/utils/Utils.cpp
 )
 
+set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(GENERATED_INCLUDE_DIR "${GENERATED_DIR}/include")
+set(GENERATED_RESOURCE_DIR "${GENERATED_DIR}/cmake")
+
+file(MAKE_DIRECTORY
+    "${GENERATED_INCLUDE_DIR}"
+    "${GENERATED_RESOURCE_DIR}"
+)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in"
+    "${GENERATED_INCLUDE_DIR}/version.h"
+    @ONLY
+)
+
+# ⚠ A CRASH LOG THAT CANNOT NAME OUR BUILD COSTS A DIAGNOSIS. This puts the
+# version into the DLL itself, so Crash Logger and Trainwreck print it beside
+# our name like every other plugin. Generated from project() so it cannot
+# drift from the other version files.
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in"
+    "${GENERATED_RESOURCE_DIR}/version.rc"
+    @ONLY
+)
+
+target_include_directories(ImprovedCameraSE BEFORE PRIVATE
+    "${GENERATED_INCLUDE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_sources(ImprovedCameraSE PRIVATE
+    "${GENERATED_RESOURCE_DIR}/version.rc"
+)
+
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 target_precompile_headers(${PROJECT_NAME} PRIVATE ImprovedCamera/PCH/PCH.h)
 # ImprovedCamera/vendor holds the vendored headers glm, imgui, mINI, stb
 # resolved at runtime via RequestFUCK / GetProcAddress - no link-time coupling).
 target_include_directories(${PROJECT_NAME} PRIVATE ImprovedCamera/include ImprovedCamera/PCH ImprovedCamera/vendor ImprovedCamera/vendor/glm ImprovedCamera/vendor/imgui ImprovedCamera/vendor/mINI/src ImprovedCamera/vendor/minhook/include)
 # Additional dependencies for dll (see above)
-target_link_libraries(${PROJECT_NAME} PRIVATE JsonCpp::JsonCpp imgui::imgui
+target_link_libraries(${PROJECT_NAME} PRIVATE JsonCpp::JsonCpp
                                               safetyhook::safetyhook)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_DEFINE_MATH_OPERATORS)
@@ -156,6 +199,40 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     # copy_directory_if_different needs CMake 3.26 and this project's floor is
     # 3.21, so this always rewrites rather than skipping unchanged files, which
     # is cheap for a folder of small JSON files and one font.
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_SOURCE_DIR}/assets" "${OUTPUT_FOLDER}/"
+    # REWORK required: fomod is not usable in this state because we have NG setup (single dll)
+    # COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_SOURCE_DIR}/assets" "${DLL_FOLDER}/"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${DLL_FOLDER}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
     VERBATIM)
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ImprovedCamera/vendor/imgui")
+
+target_sources(ImprovedCameraSE PRIVATE
+    "${IMGUI_DIR}/imgui.cpp"
+    "${IMGUI_DIR}/imgui_draw.cpp"
+    "${IMGUI_DIR}/imgui_tables.cpp"
+    "${IMGUI_DIR}/imgui_widgets.cpp"
+    "${IMGUI_DIR}/imgui_demo.cpp"
+)
+
+target_include_directories(ImprovedCameraSE BEFORE PRIVATE
+    "${IMGUI_DIR}"
+)
+enable_language(C)
+
+set(MINHOOK_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/ImprovedCamera/vendor/minhook"
+)
+
+add_library(ImprovedCameraMinHook STATIC
+    "${MINHOOK_DIR}/src/buffer.c"
+    "${MINHOOK_DIR}/src/hook.c"
+    "${MINHOOK_DIR}/src/trampoline.c"
+    "${MINHOOK_DIR}/src/hde/hde64.c"
+)
+
+target_include_directories(ImprovedCameraMinHook PUBLIC
+    "${MINHOOK_DIR}/include"
+)
+
+target_link_libraries(ImprovedCameraSE PRIVATE
+    ImprovedCameraMinHook
+)
