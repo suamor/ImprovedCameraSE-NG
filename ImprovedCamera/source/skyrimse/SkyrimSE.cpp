@@ -62,7 +62,7 @@ namespace Patch {
 	void SkyrimSE::ExecutableInfo()
 	{
 		char currentDirectory[MAX_PATH]{};
-		const DWORD directorySize = GetCurrentDirectory(MAX_PATH, currentDirectory);
+		const DWORD directorySize = GetCurrentDirectoryA(MAX_PATH, currentDirectory);
 
 		if (directorySize && directorySize <= MAX_PATH)
 		{
@@ -73,19 +73,22 @@ namespace Patch {
 		char File[MAX_PATH]{};
 		sprintf_s(File, "%s%s", m_Path.c_str(), m_FullName.c_str());
 
-		const DWORD versionSize = GetFileVersionInfoSize(File, NULL);
+		const DWORD versionSize = GetFileVersionInfoSizeA(File, NULL);
 		std::uint32_t version[4]{};
 
 		if (versionSize)
 		{
 			std::uint8_t* versionBuffer = new std::uint8_t[versionSize];
 
-			if (versionBuffer && GetFileVersionInfo(File, NULL, versionSize, versionBuffer))
+			if (versionBuffer && GetFileVersionInfoA(File, NULL, versionSize, versionBuffer))
 			{
 				char* productVersion = nullptr;
 				std::uint32_t productVersionLen = 0;
 
-				if (VerQueryValueA(versionBuffer, TEXT("\\StringFileInfo\\040904B0\\ProductVersion"), reinterpret_cast<LPVOID*>(&productVersion), reinterpret_cast<std::uint32_t*>(&productVersionLen)) && productVersionLen && productVersion)
+                constexpr char productVersionPath[] =
+                    "\\StringFileInfo\\040904B0\\ProductVersion";
+
+                if (VerQueryValueA(versionBuffer, productVersionPath, reinterpret_cast<LPVOID*>(&productVersion), &productVersionLen) && productVersionLen && productVersion)
 				{
 					Utils::GetVersionFromString(productVersion, version);
 
@@ -96,7 +99,7 @@ namespace Patch {
 					{
 						GetModuleInformation(GetCurrentProcess(), hModule, &moduleInfo, sizeof(MODULEINFO));
 						m_BaseAddress = reinterpret_cast<std::uintptr_t>(moduleInfo.lpBaseOfDll);
-						m_ImageSize = (std::uintptr_t)moduleInfo.SizeOfImage;
+						m_ImageSize = static_cast<std::uintptr_t>(moduleInfo.SizeOfImage);
 					}
 				}
 			}
