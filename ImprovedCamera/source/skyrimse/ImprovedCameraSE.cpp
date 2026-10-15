@@ -83,6 +83,23 @@ namespace ImprovedCamera {
 						}
 						break;
 					}
+                    // Physically the below is complete nonsense, thank you msvc not accepting keyboard only support
+                    case RE::INPUT_DEVICE::kNone:
+                    case RE::INPUT_DEVICE::kGamepad:
+                    case RE::INPUT_DEVICE::kFlatVirtualKeyboard:
+                    case RE::INPUT_DEVICE::kFlatTotal:
+#ifdef ENABLE_SKYRIM_VR
+                    case RE::INPUT_DEVICE::kOculusPrimary:
+                    case RE::INPUT_DEVICE::kOculusSecondary:
+                    case RE::INPUT_DEVICE::kWMRPrimary:
+                    case RE::INPUT_DEVICE::kWMRSecondary:
+                    case RE::INPUT_DEVICE::kVRVirtualKeyboard:
+                    case RE::INPUT_DEVICE::kVRTotal:
+#endif
+                    {
+                        // These input devices are not handled by the ImGui menu.
+                        break;
+                    }
 				}
 			}
 		}
