@@ -240,12 +240,12 @@ namespace Systems {
 			{
 				m_PreInitialized = false;
 				errorInfo = "Invalid Profile: " + m_ModuleData.sProfileName;
-				MessageBox(NULL, errorInfo.c_str(), plugin->Description().c_str(), MB_ICONERROR);
+				MessageBoxA(NULL, errorInfo.c_str(), plugin->Description().c_str(), MB_ICONERROR);
 			}
 			else if (!m_PreInitialized)
 			{
 				errorInfo = "Invalid: " + m_Name;
-				MessageBox(NULL, errorInfo.c_str(), plugin->Description().c_str(), MB_ICONERROR);
+				MessageBoxA(NULL, errorInfo.c_str(), plugin->Description().c_str(), MB_ICONERROR);
 			}
 			return false;
 		}
