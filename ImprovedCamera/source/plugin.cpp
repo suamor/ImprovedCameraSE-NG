@@ -36,7 +36,7 @@ namespace DLLMain {
 		m_VersionBuild = VERSION_BUILD;
 
 		char currentDirectory[MAX_PATH]{};
-		const DWORD directorySize = GetCurrentDirectory(MAX_PATH, currentDirectory);
+		const DWORD directorySize = GetCurrentDirectoryA(MAX_PATH, currentDirectory);
 
 		if (directorySize && directorySize <= MAX_PATH)
 		{
