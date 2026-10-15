@@ -83,25 +83,29 @@ namespace Menu {
 				}
 				else
 				{
-					char winDir[MAX_PATH];
-					if (GetWindowsDirectory(winDir, MAX_PATH))
-					{
-						sprintf_s(winDir, "%s\\Fonts\\", winDir);
-						customFont = winDir + m_pluginConfig->ModuleData().sMenuFont;
+                    char winDir[MAX_PATH]{};
+                    const UINT length = GetWindowsDirectoryA(winDir, MAX_PATH);
 
-						if (std::filesystem::exists(customFont))
-						{
-							// TODO: Workout maximum size
-							if (fontSize < 10)
-							{
-								fontSize = 10.0f;
-							}
-							LOG_TRACE("  MenuFont:\t\t\t\t{}", customFont.c_str());
-							LOG_TRACE("  MenuFontSize:\t\t\t{}", fontSize);  // %.1f
-							io.FontDefault = io.Fonts->AddFontFromFileTTF(customFont.c_str(), fontSize);
-						}
-					}
-				}
+                    if (length > 0 && length < MAX_PATH)
+                    {
+                        std::string fontDirectory(winDir);
+                        fontDirectory += "\\Fonts\\";
+                        customFont = fontDirectory + m_pluginConfig->ModuleData().sMenuFont;
+
+                        if (std::filesystem::exists(customFont))
+                        {
+                            // TODO: Workout maximum size
+                            if (fontSize < 10)
+                            {
+                                fontSize = 10.0f;
+                            }
+
+                            LOG_TRACE("  MenuFont:\t\t\t\t{}", customFont.c_str());
+                            LOG_TRACE("  MenuFontSize:\t\t\t\t{}", fontSize);
+                            io.FontDefault = io.Fonts->AddFontFromFileTTF(customFont.c_str(), fontSize);
+                        }
+                    }
+                }
 				ImFontConfig config;
 				config.MergeMode = true;
 				config.GlyphMinAdvanceX = 14.0f;  // Use if you want to make the icon monospaced
