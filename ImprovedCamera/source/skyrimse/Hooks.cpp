@@ -594,10 +594,10 @@ namespace Patch {
 		// Update zNear, this one fixes water going opaque.
 		NiCamera_Update::Install();
 		// Fix third person player fading.
-		if (!GetModuleHandle("OStim.dll"))
+		if (!GetModuleHandleW(L"OStim.dll"))
 			PlayerCameraUnk0_Update::Install();
 		// Fix CaptureWarmer fading.
-		if (GetModuleHandle("CaptureWarmer.dll"))
+		if (GetModuleHandleW(L"CaptureWarmer.dll"))
 			FadeOutGame_Update::Install();
 
 		// Patch Horse looking downwards

@@ -42,7 +42,7 @@ namespace Menu {
 
 	MenuHide::MenuHide()
 	{
-		if (GetModuleHandle("ImmersiveEquipmentDisplays.dll") && !s_iedActive)
+		if (GetModuleHandleW(L"ImmersiveEquipmentDisplays.dll") && !s_iedActive)
 			s_iedActive = true;
 
 		// Table 1
