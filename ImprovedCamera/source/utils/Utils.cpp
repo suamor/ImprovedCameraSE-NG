@@ -16,7 +16,7 @@
 
 namespace Utils {
 
-    static std::wstring ToWide(const char* text)
+    std::wstring ToWide(const char* text)
     {
         if (!text || !*text)
             return {};

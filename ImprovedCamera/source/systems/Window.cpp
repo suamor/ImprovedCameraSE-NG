@@ -137,7 +137,7 @@ namespace Systems {
 					HMODULE hModule = nullptr;
 					char moduleName[MAX_PATH]{};
 					GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(m_Properties->Wndproc), &hModule);
-					GetModuleBaseName(GetCurrentProcess(), hModule, moduleName, MAX_PATH);
+					GetModuleBaseNameA(GetCurrentProcess(), hModule, moduleName, MAX_PATH);
 					LOG_TRACE("  Wndproc:\t\t\t\t0x{:016X} ({})", (std::uint64_t)m_Properties->Wndproc, moduleName);
 
 					if (m_MenuMode == UIDisplay::kOverlay)
