@@ -16,12 +16,34 @@
 
 namespace Utils {
 
+    static std::wstring ToWide(const char* text)
+    {
+        if (!text || !*text)
+            return {};
+
+        const int length = MultiByteToWideChar(
+            CP_UTF8, MB_ERR_INVALID_CHARS, text, -1, nullptr, 0);
+
+        if (length == 0)
+            return {};
+
+        std::wstring result(static_cast<size_t>(length), L'\0');
+
+        if (MultiByteToWideChar(
+                CP_UTF8, MB_ERR_INVALID_CHARS, text, -1,
+                result.data(), length) == 0)
+            return {};
+
+        result.resize(static_cast<size_t>(length - 1));
+        return result;
+    }
+
 	const std::string GetFileInfo(const std::string& fullFilePath, const std::string& keyValue)
 	{
 		char File[MAX_PATH]{};
 		sprintf_s(File, "%s", fullFilePath.c_str());
 
-		const DWORD versionSize = GetFileVersionInfoSize(File, nullptr);
+		const DWORD versionSize = GetFileVersionInfoSizeA(File, nullptr);
 		DWORD versionLen = 0, langID = 0;
 		std::string strValue{};
 
@@ -29,7 +51,7 @@ namespace Utils {
 		{
 			std::uint8_t* versionBuffer = new std::uint8_t[versionSize];
 
-			if (versionBuffer && GetFileVersionInfo(File, versionLen, versionSize, versionBuffer))
+			if (versionBuffer && GetFileVersionInfoA(File, versionLen, versionSize, versionBuffer))
 			{
 				if (keyValue.compare("ProductVersion") == 0)
 				{
@@ -55,7 +77,7 @@ namespace Utils {
 					bool retVal = false;
 
 					sprintf_s(fileInfo, "\\VarFileInfo\\Translation");
-					retVal = VerQueryValue(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
+					retVal = VerQueryValueA(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
 
 					if (retVal && fileInfoLen == 4)
 					{
@@ -67,13 +89,13 @@ namespace Utils {
 						// Default language
 						sprintf_s(fileInfo, "\\StringFileInfo\\040904B0\\%s", keyValue.c_str());
 					}
-					retVal = VerQueryValue(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
+					retVal = VerQueryValueA(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
 
 					if (!retVal)
 					{
 						// Alien language
 						sprintf_s(fileInfo, "\\StringFileInfo\\00000000\\%s", keyValue.c_str());
-						retVal = VerQueryValue(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
+						retVal = VerQueryValueA(versionBuffer, fileInfo, &fileInfoValue, reinterpret_cast<std::uint32_t*>(&fileInfoLen));
 					}
 
 					if (retVal)

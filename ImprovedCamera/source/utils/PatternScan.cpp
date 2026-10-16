@@ -10,6 +10,8 @@
 /* Based upon learn_more's findPattern_v2 */
 #include "utils/PatternScan.h"
 
+#include "utils/Utils.h"
+
 #include <tlhelp32.h>
 
 namespace Utils {
@@ -57,7 +59,10 @@ namespace Utils {
 			{
 				*pattern++ = 0;
 				*mask++ = '?';
-				patternString += ((*(PWORD)patternString == (WORD)'\?\?') ? 2 : 1);
+
+                // Skip "??" as a pair, or a single "?" wildcard.
+                patternString += (patternString[1] == '?' ? 2 : 1);
+				//patternString += ((*(PWORD)patternString == (WORD)'\?\?') ? 2 : 1);
 			}
 			else
 			{
@@ -133,22 +138,26 @@ namespace Utils {
 		if (!hModule)
 			return nullptr;
 
+        const std::wstring wideModuleName = ToWide(moduleName);
+        if (wideModuleName.empty())
+            return 0; // Use the function's existing failure return value if different.
+
 		// Create toolhelp snapshot for modules
 		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, 0);
-		MODULEENTRY32 process{};
+		MODULEENTRY32W process{};
 		process.dwSize = sizeof(process);
 		DWORD pid = 0;
 
-		if (Module32First(snapshot, &process))
+		if (Module32FirstW(snapshot, &process))
 		{
 			do
 			{
-				if (_stricmp(process.szModule, moduleName) == 0)
+				if (_wcsicmp(process.szModule, wideModuleName.c_str()) == 0)
 				{
 					pid = process.th32ProcessID;
 					break;
 				}
-			} while (Module32Next(snapshot, &process));
+			} while (Module32NextW(snapshot, &process));
 		}
 
 		CloseHandle(snapshot);

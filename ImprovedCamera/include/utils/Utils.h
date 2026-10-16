@@ -8,6 +8,7 @@
 
 namespace Utils {
 
+    std::wstring ToWide(const char* text);
 	extern const std::string GetFileInfo(const std::string& fullFilePath, const std::string& keyValue);
 	extern bool PluginExists(const std::string& name, bool appPath = false);
 	extern void GetVersionFromString(const std::string& text, std::uint32_t version[]);

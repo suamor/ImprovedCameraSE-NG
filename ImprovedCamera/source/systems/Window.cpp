@@ -92,7 +92,7 @@ namespace Systems {
 				if (timeout > maxTimeout)
 					break;
 
-				m_Properties->hWnd = FindWindow(nullptr, m_Properties->name.c_str());
+				m_Properties->hWnd = FindWindowA(nullptr, m_Properties->name.c_str());
 			}
 
 			if (m_Properties->hWnd)
@@ -136,7 +136,7 @@ namespace Systems {
 					// Check if a module has already hooked the WNDPROC.
 					HMODULE hModule = nullptr;
 					char moduleName[MAX_PATH]{};
-					GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(m_Properties->Wndproc), &hModule);
+					GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(m_Properties->Wndproc), &hModule);
 					GetModuleBaseName(GetCurrentProcess(), hModule, moduleName, MAX_PATH);
 					LOG_TRACE("  Wndproc:\t\t\t\t0x{:016X} ({})", (std::uint64_t)m_Properties->Wndproc, moduleName);
 
@@ -201,18 +201,18 @@ namespace Systems {
 	{
 		auto plugin = DLLMain::Plugin::Get();
 
-		WNDCLASSEX wcex{};
-		wcex.cbSize = sizeof(WNDCLASSEX);
+		WNDCLASSEXA wcex{};
+		wcex.cbSize = sizeof(wcex);
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = MessageHandler;
 		wcex.hInstance = GetModuleHandleA(nullptr);
-		wcex.lpszClassName = TEXT(plugin->Name().c_str());
-		RegisterClassEx(&wcex);
+		wcex.lpszClassName = plugin->Name().c_str();
+		RegisterClassExA(&wcex);
 
-		m_MenuHwnd = CreateWindowEx(
+		m_MenuHwnd = CreateWindowExA(
 			WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE,  // Makes the Window appear above everything else, also removes the taskbar icon.
 			wcex.lpszClassName,
-			TEXT(plugin->Description().c_str()),
+			plugin->Description().c_str(),
 			WS_POPUP,
 			m_Properties->position.x,
 			m_Properties->position.y,
@@ -225,7 +225,7 @@ namespace Systems {
 
 		if (!m_MenuHwnd)
 		{
-			UnregisterClass(wcex.lpszClassName, wcex.hInstance);
+			UnregisterClassA(wcex.lpszClassName, wcex.hInstance);
 			return false;
 		}
 
